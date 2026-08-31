@@ -1,0 +1,5 @@
+lemma_rca_cloud/
+venv/
+*.zip
+__pycache__/
+*.keras
