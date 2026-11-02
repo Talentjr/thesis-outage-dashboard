@@ -150,7 +150,7 @@ with tab1:
         fig.add_hline(y=crit, line_dash="dash", line_color="red", annotation_text="Critical", annotation_position="top right")
         if scale_mode.startswith("Zoomed"):
             upper, step_ = zoom_axis(crit)
-            yr, dt = [0, upper], step_
+            yr, dt = [0, upper], (50 if upper <= 1000 else step_)      # gridlines every 50 ms on the zoomed view
         else:
             yr, dt = [0, float(max(values.max(), crit)) * 1.05], None
         fig.update_layout(xaxis_title="Time (UTC)", yaxis_title="Latency (ms)", height=450,
@@ -165,13 +165,13 @@ with tab1:
     if st.session_state.get("ctx") != ctx:              # restart the replay when the incident or period changes
         st.session_state.ctx = ctx
         st.session_state.frame = 10
-    autoplay = st.checkbox("Live auto-play (simulated replay of this period, one pass = 50 seconds, loops)")
+    autoplay = st.checkbox("Live auto-play (simulated replay of this period, loops continuously)")
 
     if autoplay:
-        REPLAY_SECONDS = 50                      # one full pass of the period takes 50 seconds of real time
+        REPLAY_SECONDS = 15                      # one full pass of the period takes 15 seconds of real time
         if "t0" not in st.session_state or st.session_state.get("t0_ctx") != ctx:
             st.session_state.t0, st.session_state.t0_ctx = time.time(), ctx
-        elapsed = (time.time() - st.session_state.t0) % REPLAY_SECONDS      # loops every 50 s
+        elapsed = (time.time() - st.session_state.t0) % REPLAY_SECONDS
         f = min(len(values), max(10, int(elapsed / REPLAY_SECONDS * len(values))))
         st.session_state.frame = f
         recent = values[max(0, f - 5):f]
