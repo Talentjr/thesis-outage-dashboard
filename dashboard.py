@@ -165,13 +165,15 @@ with tab1:
     if st.session_state.get("ctx") != ctx:              # restart the replay when the incident or period changes
         st.session_state.ctx = ctx
         st.session_state.frame = 10
-    autoplay = st.checkbox("Live auto-play (simulated replay of this period, loops continuously)")
+    autoplay = st.checkbox("Live auto-play (simulated replay of this period, one pass = 50 seconds, loops)")
 
     if autoplay:
-        st.session_state.frame += max(1, len(values) // 150)
-        if st.session_state.frame > len(values):
-            st.session_state.frame = 10
-        f = st.session_state.frame
+        REPLAY_SECONDS = 50                      # one full pass of the period takes 50 seconds of real time
+        if "t0" not in st.session_state or st.session_state.get("t0_ctx") != ctx:
+            st.session_state.t0, st.session_state.t0_ctx = time.time(), ctx
+        elapsed = (time.time() - st.session_state.t0) % REPLAY_SECONDS      # loops every 50 s
+        f = min(len(values), max(10, int(elapsed / REPLAY_SECONDS * len(values))))
+        st.session_state.frame = f
         recent = values[max(0, f - 5):f]
         cur, cur_t = float(recent.max()), times[f - 1]
         sev = classify(cur, warn, crit)
