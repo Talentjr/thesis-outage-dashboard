@@ -86,7 +86,9 @@ with tab1:
         fig.add_trace(go.Scatter(x=t, y=v, mode="lines", name="Latency (ms)"))
         fig.add_hline(y=warn, line_dash="dash", line_color="orange", annotation_text="Warning")
         fig.add_hline(y=crit, line_dash="dash", line_color="red", annotation_text="Critical")
-        fig.update_layout(xaxis_title="Time (UTC)", yaxis_title="Latency (ms)", height=450)
+        fig.update_layout(xaxis_title="Time (UTC)", yaxis_title="Latency (ms)", height=450,
+                          yaxis_range=[0, float(max(values.max(), crit)) * 1.05],
+                          xaxis_range=[times[0], times[-1]])
         return fig
 
     st.markdown("**Latency timeline**")
@@ -96,7 +98,7 @@ with tab1:
         st.session_state.frame = 10
     autoplay = st.checkbox("Live auto-play (simulated replay, loops continuously)")
     if autoplay:
-        st.session_state.frame += max(1, len(values) // 1000)
+        st.session_state.frame += max(1, len(values) // 150)
         if st.session_state.frame > len(values):
             st.session_state.frame = 10
         f = st.session_state.frame
@@ -131,6 +133,10 @@ with tab1:
             st.warning("tfidf_rootcause.pkl not found.")
     else:
         st.info("Log signatures have only been generated for incident 20240124.")
+
+    if autoplay:
+        time.sleep(0.1)
+        st.rerun()
 
 # ------------------------------------------------------------------ compare
 with tab2:
