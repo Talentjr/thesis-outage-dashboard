@@ -72,9 +72,13 @@ with tab1:
     c3.metric(f"Warning ({normal_pct}th pct)", f"{warn:.1f} ms")
     c4.metric(f"Critical ({critical_pct}th pct)", f"{crit:.1f} ms")
 
-    step = max(1, len(latency) // 3000)
-    sample = latency.iloc[::step]
-    times, values = to_dt(sample.index), sample.values
+    # Downsample for the chart by taking the MAXIMUM of each bucket, so short spikes are never skipped.
+    n_buckets = min(3000, len(latency))
+    edges = np.linspace(0, len(latency), n_buckets + 1).astype(int)
+    vals_all = latency.values
+    values = np.array([vals_all[a:b].max() for a, b in zip(edges[:-1], edges[1:]) if b > a])
+    first_idx = np.array([latency.index[a] for a, b in zip(edges[:-1], edges[1:]) if b > a])
+    times = to_dt(first_idx)
 
     def chart(up_to=None):
         t, v = (times, values) if up_to is None else (times[:up_to], values[:up_to])
