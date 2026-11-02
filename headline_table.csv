@@ -1,0 +1,6 @@
+incident,test_anomaly_rate_pct,test_positives,lstm_roc_auc,lstm_pr_auc,no_skill_pr_auc,logreg_other_metrics_roc,best_latency_baseline_roc
+20231207,2.528,299,0.500 ± 0.000,0.025,0.025,0.480,0.760 (logistic regression on latency lags)
+20231221,100.0,16113,n/a ± n/a,1.000,1.000,n/a,n/a
+20240115,27.054,5591,0.434 ± 0.275,0.330,0.271,0.290,0.955 (logistic regression on latency lags)
+20240124,1.096,270,0.672 ± 0.006,0.044,0.011,0.623,0.797 (persistence: latest latency)
+20240207,3.651,943,0.508 ± 0.022,0.040,0.037,0.478,0.762 (rolling max of last 10 latencies)
